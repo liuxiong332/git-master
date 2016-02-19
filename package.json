@@ -1,0 +1,31 @@
+{
+  "name": "git-master",
+  "version": "0.0.0",
+  "description": "The git ui client.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liuxiong332/git-master.git"
+  },
+  "keywords": [
+    "git",
+    "ui"
+  ],
+  "author": "liuxiong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/liuxiong332/git-master/issues"
+  },
+  "homepage": "https://github.com/liuxiong332/git-master#readme",
+  "devDependencies": {
+    "cross-spawn-async": "^2.1.8",
+    "electron-builder": "^2.7.2",
+    "electron-packager": "^5.2.1",
+    "electron-prebuilt": "^0.36.7",
+    "electron-rebuild": "^1.1.3",
+    "gulp": "^3.9.1"
+  }
+}
