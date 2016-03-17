@@ -18,8 +18,8 @@ var COMPILERS = {
 var cacheStats = {}
 var cacheDirectory = null
 
-exports.setAtomHomeDirectory = function (atomHome) {
-  var cacheDir = path.join(atomHome, 'compile-cache')
+exports.setAppHomeDirectory = function (appHome) {
+  var cacheDir = path.join(appHome, 'compile-cache')
   if (process.env.USER === 'root' && process.env.SUDO_USER && process.env.SUDO_USER !== process.env.USER) {
     cacheDir = path.join(cacheDir, 'root')
   }
@@ -34,8 +34,8 @@ exports.getCacheDirectory = function () {
   return cacheDirectory
 }
 
-exports.addPathToCache = function (filePath, atomHome) {
-  this.setAtomHomeDirectory(atomHome)
+exports.addPathToCache = function (filePath, appHome) {
+  this.setAppHomeDirectory(appHome)
   var extension = path.extname(filePath)
 
   if (extension === '.cson') {

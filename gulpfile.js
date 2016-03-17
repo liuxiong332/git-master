@@ -42,7 +42,7 @@ gulp.task('pack', function(done) {
 });
 
 gulp.task('start', function(done) {
-  runNpmCmd('electron', ['./src/main.js'], done);
+  runNpmCmd('electron', ['./dist/browser/main.js', '--enable-logging'], done);
 });
 
 gulp.task('coffee', function() {
@@ -57,6 +57,11 @@ gulp.task('babel', function() {
       presets: ['es2015']
     }))
     .pipe(gulp.dest('./dist/'))
+});
+
+gulp.task('electron-rebuild', function(done) {
+  console.log('hello')
+  runNpmCmd('electron-rebuild', [], done);
 });
 
 gulp.task('compile', ['coffee', 'babel']);

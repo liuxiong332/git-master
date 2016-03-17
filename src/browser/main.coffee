@@ -13,9 +13,9 @@ console.log = require 'nslog'
 
 start = ->
   args = parseCommandLine()
-  setupAtomHome(args)
+  setupGitMasterHome(args)
   setupCompileCache()
-  return if handleStartupEventWithSquirrel()
+  # return if handleStartupEventWithSquirrel()
 
   # NB: This prevents Win10 from showing dupe items in the taskbar
   app.setAppUserModelId('com.squirrel.atom.atom')
@@ -35,14 +35,14 @@ start = ->
   if args.userDataDir?
     app.setPath('userData', args.userDataDir)
   else if args.test
-    app.setPath('userData', temp.mkdirSync('atom-test-data'))
+    app.setPath('userData', temp.mkdirSync('git-master-test-data'))
 
   app.on 'ready', ->
     app.removeListener 'open-file', addPathToOpen
     app.removeListener 'open-url', addUrlToOpen
 
-    AtomApplication = require path.join(args.resourcePath, 'src', 'browser', 'atom-application')
-    AtomApplication.open(args)
+    # AppApplication = require path.join(args.resourcePath, 'src', 'browser', 'app-application')
+    # AppApplication.open(args)
 
     console.log("App load time: #{Date.now() - global.shellStartTime}ms") unless args.test
 
@@ -61,30 +61,18 @@ handleStartupEventWithSquirrel = ->
 setupCrashReporter = ->
   # crashReporter.start(productName: 'Atom', companyName: 'GitHub', submitURL: 'http://54.249.141.255:1127/post')
 
-setupAtomHome = ({setPortable}) ->
-  return if process.env.ATOM_HOME
+setupGitMasterHome = ({setPortable}) ->
+  return if process.env.GIT_MASTER_HOME
 
-  atomHome = path.join(app.getPath('home'), '.atom')
-  AtomPortable = require './atom-portable'
-
-  if setPortable and not AtomPortable.isPortableInstall(process.platform, process.env.ATOM_HOME, atomHome)
-    try
-      AtomPortable.setPortable(atomHome)
-    catch error
-      console.log("Failed copying portable directory '#{atomHome}' to '#{AtomPortable.getPortableAtomHomePath()}'")
-      console.log("#{error.message} #{error.stack}")
-
-  if AtomPortable.isPortableInstall(process.platform, process.env.ATOM_HOME, atomHome)
-    atomHome = AtomPortable.getPortableAtomHomePath()
-
+  gitMasterHome = path.join(app.getPath('home'), '.git-master')
   try
-    atomHome = fs.realpathSync(atomHome)
+    gitMasterHome = fs.realpathSync(gitMasterHome)
 
-  process.env.ATOM_HOME = atomHome
+  process.env.GIT_MASTER_HOME = gitMasterHome
 
 setupCompileCache = ->
   compileCache = require('../compile-cache')
-  compileCache.setAtomHomeDirectory(process.env.ATOM_HOME)
+  compileCache.setAtomHomeDirectory(process.env.GIT_MASTER_HOME)
 
 writeFullVersion = ->
   process.stdout.write """
@@ -97,6 +85,7 @@ writeFullVersion = ->
 
 parseCommandLine = ->
   version = app.getVersion()
+  console.log process.args[1..]
   options = yargs(process.argv[1..]).wrap(100)
   options.usage """
     Git Master v#{version}
