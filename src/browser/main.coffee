@@ -13,7 +13,7 @@ console.log = require 'nslog'
 
 start = ->
   args = parseCommandLine()
-  setupGitMasterHome(args)
+  setupAppHome(args)
   setupCompileCache()
   # return if handleStartupEventWithSquirrel()
 
@@ -41,8 +41,8 @@ start = ->
     app.removeListener 'open-file', addPathToOpen
     app.removeListener 'open-url', addUrlToOpen
 
-    # AppApplication = require path.join(args.resourcePath, 'src', 'browser', 'app-application')
-    # AppApplication.open(args)
+    AppApplication = require path.join(args.resourcePath, 'src', 'browser', 'application')
+    AppApplication.open(args)
 
     console.log("App load time: #{Date.now() - global.shellStartTime}ms") unless args.test
 
@@ -61,18 +61,18 @@ handleStartupEventWithSquirrel = ->
 setupCrashReporter = ->
   # crashReporter.start(productName: 'Atom', companyName: 'GitHub', submitURL: 'http://54.249.141.255:1127/post')
 
-setupGitMasterHome = ({setPortable}) ->
-  return if process.env.GIT_MASTER_HOME
+setupAppHome = ({setPortable}) ->
+  return if process.env.APP_HOME
 
   gitMasterHome = path.join(app.getPath('home'), '.git-master')
   try
     gitMasterHome = fs.realpathSync(gitMasterHome)
 
-  process.env.GIT_MASTER_HOME = gitMasterHome
+  process.env.APP_HOME = gitMasterHome
 
 setupCompileCache = ->
   compileCache = require('../compile-cache')
-  compileCache.setAtomHomeDirectory(process.env.GIT_MASTER_HOME)
+  compileCache.setAppHomeDirectory(process.env.APP_HOME)
 
 writeFullVersion = ->
   process.stdout.write """
@@ -85,7 +85,6 @@ writeFullVersion = ->
 
 parseCommandLine = ->
   version = app.getVersion()
-  console.log process.args[1..]
   options = yargs(process.argv[1..]).wrap(100)
   options.usage """
     Git Master v#{version}

@@ -45,6 +45,10 @@ gulp.task('start', function(done) {
   runNpmCmd('electron', ['./dist/browser/main.js', '--enable-logging'], done);
 });
 
+gulp.task('start-dev', function(done) {
+  runNpmCmd('electron', ['./dist/browser/main.js', '--enable-logging', '-r', __dirname], done);
+});
+
 gulp.task('coffee', function() {
   gulp.src('./src/**/*.coffee')
     .pipe(coffee({bare: true}).on('error', gutil.log))
@@ -60,7 +64,6 @@ gulp.task('babel', function() {
 });
 
 gulp.task('electron-rebuild', function(done) {
-  console.log('hello')
   runNpmCmd('electron-rebuild', [], done);
 });
 
