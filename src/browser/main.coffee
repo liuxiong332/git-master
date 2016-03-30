@@ -68,6 +68,21 @@ setupAppHome = ({setPortable}) ->
   try
     gitMasterHome = fs.realpathSync(gitMasterHome)
 
+  AppPortable = require './app-portable'
+
+  if setPortable and not AppPortable.isPortableInstall(process.platform, process.env.APP_HOME, gitMasterHome)
+    try
+      AppPortable.setPortable(gitMasterHome)
+    catch error
+      console.log("Failed copying portable directory '#{gitMasterHome}' to '#{AppPortable.getPortableAppHomePath()}'")
+      console.log("#{error.message} #{error.stack}")
+
+  if AppPortable.isPortableInstall(process.platform, process.env.APP_HOME, gitMasterHome)
+    gitMasterHome = AppPortable.getPortableAppHomePath()
+
+  try
+    atomHome = fs.realpathSync(atomHome)
+
   process.env.APP_HOME = gitMasterHome
 
 setupCompileCache = ->
