@@ -1,6 +1,8 @@
 AppWindow = require './app-window'
-# ApplicationMenu = require './application-menu'
-# StorageFolder = require '../storage-folder'
+ApplicationMenu = require './application-menu'
+AppProtocolHandler = require './atom-protocol-handler'
+AutoUpdateManager = require './auto-update-manager'
+StorageFolder = require '../storage-folder'
 ipcHelpers = require '../ipc-helpers'
 {BrowserWindow, Menu, app, dialog, ipcMain, shell} = require 'electron'
 fs = require 'fs-plus'
@@ -51,7 +53,7 @@ class Application
 
   windows: null
   applicationMenu: null
-  atomProtocolHandler: null
+  appProtocolHandler: null
   resourcePath: null
   version: null
   quitting: false
@@ -68,18 +70,20 @@ class Application
     @pidsToOpenWindows = {}
     @windows = []
 
-    # @applicationMenu = new ApplicationMenu(@version)
+    @autoUpdateManager = new AutoUpdateManager(@version, options.test, @resourcePath)
+    @applicationMenu = new ApplicationMenu(@version, @autoUpdateManager)
+    @appProtocolHandler = new AppProtocolHandler(@resourcePath, @safeMode)
 
     @listenForArgumentsFromNewProcess()
     @setupJavaScriptArguments()
     @handleEvents()
     @setupDockMenu()
-    # @storageFolder = new StorageFolder(process.env.ATOM_HOME)
+    @storageFolder = new StorageFolder(process.env.APP_HOME)
 
     if options.pathsToOpen?.length > 0 or options.urlsToOpen?.length > 0 or options.test
       @openWithOptions(options)
-    # else
-    #   @loadState(options) or @openPath(options)
+    else
+      @loadState(options) or @openPath(options)
 
   openWithOptions: ({initialPaths, pathsToOpen, executedFrom, urlsToOpen, test, pidToKillWhenClosed, devMode, safeMode, newWindow, logFile, profileStartup, timeout, clearWindowState, addToLastWindow}) ->
     if test
@@ -95,7 +99,7 @@ class Application
   # Public: Removes the {AtomWindow} from the global window list.
   removeWindow: (window) ->
     if @windows.length is 1
-      # @applicationMenu?.enableWindowSpecificItems(false)
+      @applicationMenu?.enableWindowSpecificItems(false)
       if process.platform in ['win32', 'linux']
         app.quit()
         return
@@ -105,9 +109,9 @@ class Application
   # Public: Adds the {AtomWindow} to the global window list.
   addWindow: (window) ->
     @windows.push window
-    # @applicationMenu?.addWindow(window.browserWindow)
+    @applicationMenu?.addWindow(window.browserWindow)
     window.once 'window:loaded', =>
-      # @autoUpdateManager.emitUpdateAvailableEvent(window)
+      @autoUpdateManager.emitUpdateAvailableEvent(window)
 
     unless window.isSpec
       focusHandler = => @lastFocusedWindow = window
@@ -177,8 +181,10 @@ class Application
     @on 'application:search-issues', -> shell.openExternal('https://github.com/issues?q=+is%3Aissue+user%3Aatom')
 
     @on 'application:install-update', =>
-      # @quitting = true
-      # @autoUpdateManager.install()
+      @quitting = true
+      @autoUpdateManager.install()
+
+    @on 'application:check-for-update', => @autoUpdateManager.check()
 
     if process.platform is 'darwin'
       @on 'application:bring-all-windows-to-front', -> Menu.sendActionToFirstResponder('arrangeInFront:')
@@ -282,7 +288,7 @@ class Application
     ipcMain.on 'did-cancel-window-unload', =>
       @quitting = false
 
-    # clipboard = require '../safe-clipboard'
+    clipboard = require '../safe-clipboard'
     ipcMain.on 'write-text-to-selection-clipboard', (event, selectedText) ->
       clipboard.writeText(selectedText, 'selection')
 
@@ -303,9 +309,6 @@ class Application
 
     ipcMain.on 'get-auto-update-manager-state', (event) =>
       event.returnValue = @autoUpdateManager.getState()
-
-    ipcMain.on 'execute-javascript-in-dev-tools', (event, code) ->
-      event.sender.devToolsWebContents?.executeJavaScript(code)
 
   setupDockMenu: ->
     if process.platform is 'darwin'
@@ -499,8 +502,8 @@ class Application
       unless window.isSpec
         if loadSettings = window.getLoadSettings()
           states.push(initialPaths: loadSettings.initialPaths)
-    # if states.length > 0 or allowEmpty
-    #   @storageFolder.storeSync('application.json', states)
+    if states.length > 0 or allowEmpty
+      @storageFolder.storeSync('application.json', states)
 
   loadState: (options) ->
     if (states = @storageFolder.load('application.json'))?.length > 0
