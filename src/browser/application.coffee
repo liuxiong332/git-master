@@ -107,7 +107,7 @@ class Application
     @windows.push window
     # @applicationMenu?.addWindow(window.browserWindow)
     window.once 'window:loaded', =>
-      @autoUpdateManager.emitUpdateAvailableEvent(window)
+      # @autoUpdateManager.emitUpdateAvailableEvent(window)
 
     unless window.isSpec
       focusHandler = => @lastFocusedWindow = window

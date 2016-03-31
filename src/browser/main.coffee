@@ -65,8 +65,6 @@ setupAppHome = ({setPortable}) ->
   return if process.env.APP_HOME
 
   gitMasterHome = path.join(app.getPath('home'), '.git-master')
-  try
-    gitMasterHome = fs.realpathSync(gitMasterHome)
 
   AppPortable = require './app-portable'
 
@@ -81,7 +79,7 @@ setupAppHome = ({setPortable}) ->
     gitMasterHome = AppPortable.getPortableAppHomePath()
 
   try
-    atomHome = fs.realpathSync(atomHome)
+    gitMasterHome = fs.realpathSync(gitMasterHome)
 
   process.env.APP_HOME = gitMasterHome
 

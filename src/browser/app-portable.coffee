@@ -28,7 +28,7 @@ class AppPortable
       fs.removeSync(writePermissionTestFile)
       writable = true
     catch error
-      message = "Failed to use portable Atom home directory (#{@getPortableAppHomePath()}).  Using the default instead (#{defaultHome}).  #{error.message}"
+      message = "Failed to use portable GitMaster home directory (#{@getPortableAppHomePath()}).  Using the default instead (#{defaultHome}).  #{error.message}"
 
     ipcMain.on 'check-portable-home-writable', (event) ->
       event.sender.send 'check-portable-home-writable-response', {writable, message}
