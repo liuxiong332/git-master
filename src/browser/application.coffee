@@ -1,6 +1,6 @@
 AppWindow = require './app-window'
 ApplicationMenu = require './application-menu'
-AppProtocolHandler = require './atom-protocol-handler'
+AppProtocolHandler = require './app-protocol-handler'
 AutoUpdateManager = require './auto-update-manager'
 StorageFolder = require '../storage-folder'
 ipcHelpers = require '../ipc-helpers'
@@ -235,7 +235,7 @@ class Application
           options.window = window
           @openPaths(options)
         else
-          new AtomWindow(options)
+          new AppWindow(options)
       else
         @promptForPathToOpen('all', {window})
 
@@ -533,7 +533,7 @@ class Application
     unless @packages?
       PackageManager = require '../package-manager'
       @packages = new PackageManager
-        configDirPath: process.env.ATOM_HOME
+        configDirPath: process.env.APP_HOME
         devMode: devMode
         resourcePath: @resourcePath
 
@@ -544,7 +544,7 @@ class Application
         packagePath = @packages.resolvePackagePath(packageName)
         windowInitializationScript = path.resolve(packagePath, pack.urlMain)
         windowDimensions = @getDimensionsForNewWindow()
-        new AtomWindow({windowInitializationScript, @resourcePath, devMode, safeMode, urlToOpen, windowDimensions})
+        new AppWindow({windowInitializationScript, @resourcePath, devMode, safeMode, urlToOpen, windowDimensions})
       else
         console.log "Package '#{pack.name}' does not have a url main: #{urlToOpen}"
     else
@@ -589,7 +589,7 @@ class Application
     devMode = true
     isSpec = true
     safeMode ?= false
-    new AtomWindow({windowInitializationScript, resourcePath, headless, isSpec, devMode, testRunnerPath, legacyTestRunnerPath, testPaths, logFile, safeMode})
+    new AppWindow({windowInitializationScript, resourcePath, headless, isSpec, devMode, testRunnerPath, legacyTestRunnerPath, testPaths, logFile, safeMode})
 
   resolveTestRunnerPath: (testPath) ->
     FindParentDir ?= require 'find-parent-dir'

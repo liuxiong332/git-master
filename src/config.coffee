@@ -8,7 +8,7 @@ pathWatcher = require 'pathwatcher'
 {
   getValueAtKeyPath, setValueAtKeyPath, deleteValueAtKeyPath,
   pushKeyPath, splitKeyPath,
-} = require 'key-path-helpers'
+} = require './key-path-helpers'
 
 Color = require './color'
 ScopedPropertyStore = require 'scoped-property-store'

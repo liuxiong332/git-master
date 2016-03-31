@@ -37,8 +37,11 @@
   },
   "dependencies": {
     "cached-run-in-this-context": "^0.4.1",
+    "event-kit": "^2.0.0",
     "fs-plus": "^2.8.1",
     "nslog": "^3.0.0",
+    "pathwatcher": "^6.5.0",
+    "scoped-property-store": "^0.17.0",
     "season": "^5.3.0",
     "source-map-support": "^0.4.0",
     "temp": "^0.8.3",
